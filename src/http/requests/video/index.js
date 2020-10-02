@@ -7,4 +7,7 @@ export default {
   getVideo(id) {
     return axios.get(`videos/${id}`)
   },
+  update(payload) {
+    return axios.put(`videos/${payload.id}`,payload.data)
+  },
 }

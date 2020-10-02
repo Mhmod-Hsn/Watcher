@@ -33,4 +33,20 @@ export default {
         })
     })
   },
+  update({ commit, dispatch }, payload) {
+    return new Promise((resolve, reject) => {
+      video
+        .update(payload)
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          dispatch(
+            "handleError",
+            { reject: reject, error: error },
+            { root: true }
+          )
+        })
+    })
+  },
 }

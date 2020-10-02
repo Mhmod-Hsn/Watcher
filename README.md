@@ -1,4 +1,7 @@
 # dashboard
+video library which contains (skipper) to skip adult scenes and plyr ( video player ) to support subtitles perfectly. 
+
+backend was made with strapi headless CMS.
 
 ## Project setup
 ```

@@ -17,7 +17,7 @@
 			</div>
 			<div class="col-md-8 col-sm-6">
 				<div class="card bg-l-gray br-10 h-100">
-					<div class="card-body">
+					<div class="card-body d-flex  flex-column">
 						<div class="d-flex justify-content-between  h5 mb-3 ">
 							<div class="d-flex justify-content-between">
 								<b-badge pill variant="warning">
@@ -73,6 +73,7 @@
 							@click="watchTrailer"
 							block
 							variant="danger"
+							class="mt-auto"
 						>Trailer
 						</b-button>
 					
@@ -82,7 +83,7 @@
 		</div>
 		
 		<div class="watch mt-4 shadow">
-			<plyr>
+			<plyr v-if="(item.adult && (item.skipper || !lock)) || !item.adult ">
 				<video @timeupdate="watchTime" crossorigin="anonymous" id="player">
 					<source :src="base_url+item.media.url" :type="item.media.mime"/>
 					
@@ -100,8 +101,30 @@
 				
 				</video>
 			</plyr>
+			<div
+				class="p-3"
+				v-else>
+				this video is adult and has no skipper
+				
+				
+				<b-button
+					@click="lock=false"
+					variant="danger"
+					class="mt-auto ml-3"
+				>
+					Unload anyway
+				</b-button>
+			</div>
 		</div>
-	
+		
+		<div class="card mt-5">
+			<div class="card-body">
+				<p>This section for skipper test purposes</p>
+				
+				<code><pre>{{item.skipper}}</pre></code>
+			
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -114,6 +137,8 @@
         components: {Plyr, LoadingCard},
         data() {
             return {
+                lock: true,
+                
                 item: null,
                 subtitleReady: null,
                 subtitle: null,
@@ -136,7 +161,9 @@
                 this.$store.dispatch("video/getVideo", this.$route.params.id)
                     .then(response => {
                         this.item = response.data;
-                        this.skipContent = this.parseTimes(response.data.adult_skipper?.content)
+                        this.skipContent = this.parseTimes(response.data.skipper)
+                   
+                        this.addWatchCount()
                     })
             },
             watchTrailer() {
@@ -176,6 +203,8 @@
                                 start: item.start.split(':'),
                                 end: item.end.split(':')
                             };
+                            
+                            console.log(temp)
 
                             i.start = (Number(temp.start[0]) * 60 * 60) + (Number(temp.start[1]) * 60) + (Number(temp.start[2]))
                             i.end = (Number(temp.end[0]) * 60 * 60) + (Number(temp.end[1]) * 60) + (Number(temp.end[2]))
@@ -187,6 +216,14 @@
                     });
                     return final
                 }
+            },
+            addWatchCount(){
+	            let watch_count = (this.item.watch_count-(-1)).toString();
+
+                this.$store.dispatch("video/update", {id: this.$route.params.id, data: {'watch_count': watch_count}})
+                    .then(response => {
+                        this.item = response.data;
+                    })
             }
         }
     }
